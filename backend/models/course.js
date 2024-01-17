@@ -1,7 +1,7 @@
+// models/course.js
 import mongoose from 'mongoose';
 
 const Course = mongoose.models.Course || mongoose.model('Course', {
-  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,

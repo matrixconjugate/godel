@@ -1,9 +1,5 @@
-// slideModel.js
-
 import mongoose from 'mongoose';
-
 const slideSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,

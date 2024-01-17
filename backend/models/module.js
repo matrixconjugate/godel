@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 const slideSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   title: {
     type: String,
     required: true,
@@ -12,7 +11,6 @@ const slideSchema = new mongoose.Schema({
 });
 
 const moduleSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,
