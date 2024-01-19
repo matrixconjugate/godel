@@ -1,14 +1,7 @@
+// backend/api/module.js
 import mongoose from 'mongoose';
-const slideSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-});
+import Course from '../../backend/models/course';
+import Slide from './slide';
 
 const moduleSchema = new mongoose.Schema({
   name: {
@@ -24,8 +17,14 @@ const moduleSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  slides: [slideSchema],
+  slides: [{ type: mongoose.Schema.Types.ObjectId, ref: Slide }],
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Course, 
+    required: true,
+  },
 });
 
 const Module = mongoose.model('Module', moduleSchema);
+
 export default Module;

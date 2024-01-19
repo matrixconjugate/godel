@@ -1,42 +1,66 @@
-import mongoose from 'mongoose';
-import Course from '../../backend/models/course';
-await mongoose.connect('mongodb+srv://dishijain:0XFSpF35ZBZNkOR6@cluster0.rmg499r.mongodb.net/intellify?retryWrites=true&w=majority', {
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('Connection error:', err));
+// backend/api/course.js
+import mongoose from "mongoose";
+import Course from "../../backend/models/course";
 
+const connectDB = async () => {
+  
+  try {
+    const conn = await mongoose.connect(
+      "mongodb+srv://dishijain:0XFSpF35ZBZNkOR6@cluster0.rmg499r.mongodb.net/intellify?retryWrites=true&w=majority"
+    );
+    console.log("DB Connected");
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    process.exit();
+  }
+};
+connectDB()
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
-      const { _id , name, description, slug, modules } = req.body;
-      let course;
-      if (_id) {
-        const isValidObjectId = mongoose.Types.ObjectId.isValid(_id);
-        if (!isValidObjectId) {
-          return res.status(400).json({ error: 'Invalid courseId format' });
-        }
-        course = await Course.findByIdAndUpdate(_id, { name, description, slug, modules }, { new: true });
-      } else {
-        // If no courseId is provided, create a new course
-        course = new Course({name, description, slug, modules });
-        await course.save();
-      }
+      const { name, description, slug } = req.body;
+
+      const course = new Course({ name, description, slug });
+      await course.save();
 
       res.json(course);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: "Internal Server Error" });
     }
-  } else if (req.method === 'GET') {
+  } else if (req.method === "GET") {
     try {
-      const courses = await Course.find();
+      const courses = await Course.find().populate("modules");
       res.json(courses);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.log("idhar tk aa gya")
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  } else if (
+    req.method === "GET" &&
+    req.query.courseId &&
+    req.query.action === "modules"
+  ) {
+    try {
+      const courseId = req.query.courseId;
+
+      const course = await Course.findById(courseId).populate({
+        path: "modules",
+        populate: { path: "slides" },
+      });
+
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+
+      res.json(course.modules);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   } else {
-    res.status(405).json({ error: 'Method Not Allowed' });
+    res.status(405).json({ error: "Method Not Allowed" });
   }
 }

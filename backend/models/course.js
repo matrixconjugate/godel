@@ -1,7 +1,7 @@
-// models/course.js
+// backend/models/course.js
 import mongoose from 'mongoose';
 
-const Course = mongoose.models.Course || mongoose.model('Course', {
+const courseSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -15,16 +15,11 @@ const Course = mongoose.models.Course || mongoose.model('Course', {
     required: true,
     unique: true,
   },
-  modules: [{
-    title: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-  }],
+  modules: [{ type: mongoose.Schema.Types.ObjectId, ref: () => require('./module').default }],
 });
+
+const Course = mongoose.models.Course
+  ? mongoose.model('Course')
+  : mongoose.model('Course', courseSchema);
 
 export default Course;
