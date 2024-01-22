@@ -1,11 +1,8 @@
 import mongoose from 'mongoose';
-
+import Module from './module';
+import Course from './course';
 const slideSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: true,
-  },
-  description: {
     type: String,
     required: true,
   },
@@ -16,12 +13,12 @@ const slideSchema = new mongoose.Schema({
   },
   moduleId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Module',
+    ref:Module,
     required: true,
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
+    ref: Course,
     required: true,
   },
 });

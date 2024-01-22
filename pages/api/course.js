@@ -1,4 +1,3 @@
-// backend/api/course.js
 import mongoose from "mongoose";
 import Course from "../../backend/models/course";
 
@@ -56,6 +55,21 @@ export default async function handler(req, res) {
       }
 
       res.json(course.modules);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  } else if ( req.method === "GET" && req.query.courseId ) {
+    try {
+      const courseId = req.query.courseId;
+      console.log(courseId);
+      const course = await Course.findById(courseId);
+   
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+
+      res.json(course);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });

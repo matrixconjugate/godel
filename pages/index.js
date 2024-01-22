@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import styles from '@/styles/Home.module.css';
+import Link from 'next/link';
 
 export default function Home() {
   const [courses, setCourses] = useState([]);
-   
+  const [showAddCoursePopup, setShowAddCoursePopup] = useState(false);
+  const [newCourseName, setNewCourseName] = useState('');
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await fetch('/api/course');
         const newCourses = await response.json();
-        console.log(newCourses);
         setCourses(newCourses);
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -17,12 +19,46 @@ export default function Home() {
     };
 
     fetchCourses();
-  }, []); 
-return (
-  <div className={styles.container}>
-    <button className={styles.addButton} onClick={() => console.log('Button clicked')}>
-      Add Course
-    </button>
+  }, []);
+
+  const handleAddCourse = () => {
+    setShowAddCoursePopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowAddCoursePopup(false);
+  };
+
+  const handleSaveCourse = () => {
+    // Perform save course logic here
+    console.log('Saving course:', newCourseName);
+    handleClosePopup();
+  };
+
+  return (
+    <div className={styles.container}>
+      <button className={styles.addButton} onClick={handleAddCourse}>
+        Add Course
+      </button>
+      {showAddCoursePopup && (
+        <div className={styles.popup}>
+          <div className={styles.popupContent}>
+            <label htmlFor="newCourseName"><h3>Course Name:</h3></label>
+            <input
+              type="text"
+              id="newCourseName"
+              value={newCourseName}
+              onChange={(e) => setNewCourseName(e.target.value)}
+            />
+
+            <div className={styles.popupButtons}>
+              <button onClick={handleSaveCourse}>Save</button>
+              <button onClick={handleClosePopup}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     <table className={styles.table}>
       <thead>
         <tr>
@@ -36,16 +72,19 @@ return (
           <tr key={index}>
             <td>{index + 1}</td>
             <td>
+            <Link href={`/module/${course._id}`}>
               <button
                 type="button"
+                style={{zIndex:showAddCoursePopup?'-1':''}}
                 className={styles.courseButton}
                 onClick={() => fetchModulesForCourse(course._id)}
               >
                 {course.name}
               </button>
+              </Link>
             </td>
             <td>
-              <button type="button" className={styles.actionbutton}>
+              <button type="button" style={{zIndex:showAddCoursePopup?'-1':''}} className={styles.actionbutton} >
                 Edit
               </button>
             </td>
