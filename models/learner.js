@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const learnerSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -10,19 +11,16 @@ const learnerSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
-  phoneNumber: {
-    type: String,
-    required: true,
-  },
-  preferences: {
-    type: [String],
-  },
-  PIN: {
+  password: {
     type: String,
     required: true,
     minlength: 4,
     maxlength: 6,
   },
 });
-const Learner = mongoose.model('Learner', learnerSchema);
+
+const Learner = mongoose.models.Learner
+            ?  mongoose.model('Learner')
+            :  mongoose.model('Learner', learnerSchema);
+
 export default Learner;

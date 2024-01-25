@@ -1,43 +1,72 @@
+// pages/api/slide.js
+import dbConnect from '../../utils/dbConnect';
+import Course from '../../models/course';
 import mongoose from 'mongoose';
-import Slide from '../../backend/models/slide';
-import Module from '../../backend/models/module';
-import Course from '../../backend/models/course';
-
-await mongoose.connect('mongodb+srv://dishijain:0XFSpF35ZBZNkOR6@cluster0.rmg499r.mongodb.net/intellify?retryWrites=true&w=majority', {
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('Connection error:', err));
-
+import slugify from 'slugify';
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      const { moduleId, courseId, name, description, types } = req.body;
+  const { courseId } = req.query;
+  if (!courseId) {
+    return res.status(400).json({ error: 'Missing courseId parameter' });
+  }
+  try {
+    await dbConnect();
 
-      const module = await Module.findById(moduleId);
-      if (!module) {
-        return res.status(404).json({ error: 'Module not found' });
+    if (req.method === 'POST') {
+      try {
+        const {moduleId,slide_name, slide_type } = req.body;
+        if (!moduleId || !slide_name || !slide_type) {
+          return res.status(400).json({ error: 'moduleId, slide_name, and slide_type are required' });
+        }
+
+        const course = await Course.findById(courseId);
+        if (!course) {
+          return res.status(404).json({ error: 'Course not found' });
+        }
+
+        const module = course.modules.find((module) => module._id.equals(moduleId));
+        if (!module) {
+          return res.status(404).json({ error: 'Module not found' });
+        }
+        const slideSlug = slugify(slide_name, { lower: true });
+        const newSlide = {
+          moduleId,
+          slide_name,
+          slide_type,
+          slug: slideSlug, 
+        };
+
+        module.slides.push(newSlide);
+        await course.save();
+        res.json(newSlide);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
       }
-
-      const slide = new Slide({ name, description, types, moduleId, courseId });
-      await slide.save();
-
-      module.slides.push(slide._id);
-      await module.save();
-
-      res.json(slide);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    } else if (req.method === 'GET') {
+      const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(courseId);
+      if (!isValidObjectId) {
+        return res.status(400).json({ error: 'Invalid courseId format' });
+      }
+      try {
+        const course = await Course.findById(new mongoose.Types.ObjectId(courseId));
+        if (!course) {
+          return res.status(404).json({ error: 'Course not found' });
+        }
+        const modules = course.modules || [];
+        let allSlides = [];
+        modules.forEach((module) => {
+          allSlides = allSlides.concat(module.slides);
+        });
+        res.json(allSlides);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    } else {
+      res.status(405).json({ error: 'Method Not Allowed' });
     }
-  } else if (req.method === 'GET') {
-    try {
-      const slides = await Slide.find({});
-      res.json(slides);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  } else {
-    res.status(405).json({ error: 'Method Not Allowed' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }
