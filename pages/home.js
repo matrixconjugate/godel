@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from '@/styles/Home.module.css';
 import Link from 'next/link';
 import slugify from 'slugify';
-
+import PrivateRoute from '@/components/PrivateRoute';
 export default function Home() {
   const [courses, setCourses] = useState([]);
   const [showAddCoursePopup, setShowAddCoursePopup] = useState(false);
@@ -64,7 +64,7 @@ export default function Home() {
   const fetchModulesForCourse = async (courseId) => {
     console.log(courseId);
     try {
-      const response = await fetch(`/api/course?courseId=${courseId}&action=modules`);
+      const response = await fetch(`/api/course?courseId=${courseId}`);
       const modules = await response.json();
       console.log('Modules for course:', modules);
       // Handle the modules data as needed
@@ -74,6 +74,7 @@ export default function Home() {
   };
 
   return (
+    <PrivateRoute>
     <div className={styles.container}>
       <button className={styles.addButton} onClick={handleAddCourse}>
         Add Course
@@ -137,5 +138,6 @@ export default function Home() {
         </tbody>
       </table>
     </div>
+    </PrivateRoute>
   );
 }

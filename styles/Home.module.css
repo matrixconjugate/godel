@@ -229,7 +229,7 @@
 }
 
 .bgimage {
-  height: 45vh;
+  height: 55vh;
   background-image: url('https://mdbootstrap.com/img/new/textures/full/171.jpg');
   background-size: cover;
   background-position: center;
@@ -251,7 +251,7 @@
   backdrop-filter: blur(30px);
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-  height: 400px;
+  height: 300px;
 }
 
 /* Additional styling for form elements */

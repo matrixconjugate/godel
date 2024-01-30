@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import styles from '@/styles/Home.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-
+import PrivateRoute from '@/components/PrivateRoute';
 const Module = () => {
   const [showAddModulePopup, setShowAddModulePopup] = useState(false);
   const [newModuleName, setNewModuleName] = useState('');
@@ -14,33 +14,40 @@ const Module = () => {
   const [newSlideName, setNewSlideName] = useState('');
   const [selectedSlideType, setSelectedSlideType] = useState('text');
   const [mappedSlides, setMappedSlides] = useState([]);
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
   const { courseId } = router.query;
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        const moduleResponse = await fetch(`/api/module?courseId=${courseId}`);
-        const slideResponse = await fetch(`/api/slide?courseId=${courseId}`);
+        if (courseId) {
+          const moduleResponse = await fetch(`/api/module?courseId=${courseId}`);
+          const slideResponse = await fetch(`/api/slide?courseId=${courseId}`);
   
-        const courseModules = await moduleResponse.json();
-        const courseSlides = await slideResponse.json();
+          const courseModules = await moduleResponse.json();
+          const courseSlides = await slideResponse.json();
   
-        if (Array.isArray(courseModules)) {
-          setModules(courseModules);
+          if (Array.isArray(courseModules)) {
+            setModules(courseModules);
   
-          const allSlides = courseSlides.flatMap((slide) => ({ ...slide, moduleIndex: courseModules.findIndex(module => module._id === slide.moduleId) }));
-          setMappedSlides(allSlides);
-        } else {
-          console.error('Invalid data format for modules:', courseModules);
+            const allSlides = courseSlides.flatMap((slide) => ({
+              ...slide,
+              moduleIndex: courseModules.findIndex(module => module._id === slide.moduleId)
+            }));
+            setMappedSlides(allSlides);
+          } else {
+            console.error('Invalid data format for modules:', courseModules);
+          }
         }
       } catch (error) {
         console.error('Error fetching modules:', error);
+      } finally {
+        setLoading(false); 
       }
     };
-  
+
     fetchModules();
-  }, [courseId]);  
-  
+  });
 
   const handleAddModule = () => {
     setShowAddModulePopup(true);
@@ -87,9 +94,9 @@ const Module = () => {
 
   const handleSaveSlide = async (moduleIndex) => {
     try {
-      console.log(moduleIndex);
       const module = modules[moduleIndex];
       console.log(module);
+      console.log(module._id);
       if (!module) {
         console.error('Invalid module');
         return;
@@ -141,6 +148,7 @@ const Module = () => {
   
   
   return (
+    <PrivateRoute>
     <div className={styles.modulecontainer}>
       <div className={styles.moduleheader}>
         <h1>Module Page for Course: {courseId}</h1>
@@ -227,6 +235,7 @@ const Module = () => {
 ))}
       </div>
     </div>
+    </PrivateRoute>
   );
 };
 

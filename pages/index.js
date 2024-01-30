@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import styles from '../styles/Home.module.css';
-import Link from 'next/link';
 import axios from 'axios'; // Add axios for API requests
 import { useRouter } from "next/router";
 export default function Login() {
+  const [name,setName]=useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/login', { email, password });
+      const response = await axios.post('/api/login', {name,email, password });
       console.log(response.data.message);
+      localStorage.setItem('token', response.data.token);
       window.alert("Logged in successfully");
       router.push("/home");
     } catch (error) {
@@ -28,6 +31,13 @@ export default function Login() {
         <div className={styles.cardbody}>
           <h2>Login now</h2>
           <div className={styles.inputs}>
+          <input
+              className={styles.forminput}
+              placeholder="Name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
             <input
               className={styles.forminput}
               placeholder="Email"
@@ -46,9 +56,6 @@ export default function Login() {
               LOGIN
             </button>
           </div>
-          <Link href="/signup" style={{ color: "#1266f1" }}>
-            Don't have an account? Sign up
-          </Link>
         </div>
       </div>
     </div>
