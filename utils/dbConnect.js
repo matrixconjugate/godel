@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const MONGODB_URI =  'mongodb+srv://dishijain:0XFSpF35ZBZNkOR6@cluster0.rmg499r.mongodb.net/intellify?retryWrites=true&w=majority';
+const MONGODB_URI =  process.env.NEXT_PUBLIC_MONGODB_URI;
 
 if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');

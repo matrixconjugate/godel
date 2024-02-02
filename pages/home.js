@@ -3,60 +3,15 @@ import styles from '@/styles/Home.module.css';
 import Link from 'next/link';
 import slugify from 'slugify';
 import PrivateRoute from '@/components/PrivateRoute';
+import EpubReader from '@/components/DynamicEpubReader';
+
+import dynamic from 'next/dynamic';
+
+const DynamicEpubReader = dynamic(() => import('../components/DynamicEpubReader'), { ssr: false })
 export default function Home() {
   const [courses, setCourses] = useState([]);
   const [showAddCoursePopup, setShowAddCoursePopup] = useState(false);
   const [newCourseName, setNewCourseName] = useState('');
-  const [file, setFile] = useState(null);
-
-  const handleFileChange = async (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      try {
-        const content = await readEPUB(selectedFile);
-        const chapters = divideIntoChapters(content);
-        console.log(chapters);
-      } catch (error) {
-        console.error('Error reading EPUB file:', error);
-      }
-    }
-  };
-
-  const readEPUB = async (epubFile) => {
-    const buffer = await epubFile.arrayBuffer();
-    const content = await EPUB(buffer);
-    return content;
-  };
-
-  const divideIntoChapters = (epubContent) => {
-    return epubContent.spine.map((chapter) => chapter.content);
-  };
-
-  // const sendChunksToAPI = async (chapters) => {
-  //   const apiUrl = 'YOUR_API_ENDPOINT'; // Replace with your actual API endpoint
-
-  //   for (const chapter of chapters) {
-  //     // Divide each chapter into chunks of 4000 characters
-  //     const chunks = chunkText(chapter, 4000);
-
-  //     for (const chunk of chunks) {
-  //       try {
-  //         await axios.post(apiUrl, { chunk });
-  //         console.log('Chunk sent:', chunk);
-  //       } catch (error) {
-  //         console.error('Error sending chunk to API:', error);
-  //       }
-  //     }
-  //   }
-  // };
-
-  const chunkText = (text, chunkSize) => {
-    const chunks = [];
-    for (let i = 0; i < text.length; i += chunkSize) {
-      chunks.push(text.slice(i, i + chunkSize));
-    }
-    return chunks;
-  };
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -189,7 +144,8 @@ export default function Home() {
         </tbody>
       </table>
     </div>
-    <input type="file" onChange={handleFileChange} accept=".epub" />
+    <h1>EPUB Reader</h1>
+      <DynamicEpubReader/>
     </PrivateRoute>
   );
 }
