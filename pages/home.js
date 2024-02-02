@@ -3,11 +3,7 @@ import styles from '@/styles/Home.module.css';
 import Link from 'next/link';
 import slugify from 'slugify';
 import PrivateRoute from '@/components/PrivateRoute';
-import EpubReader from '@/components/DynamicEpubReader';
 
-import dynamic from 'next/dynamic';
-
-const DynamicEpubReader = dynamic(() => import('../components/DynamicEpubReader'), { ssr: false })
 export default function Home() {
   const [courses, setCourses] = useState([]);
   const [showAddCoursePopup, setShowAddCoursePopup] = useState(false);
@@ -144,8 +140,6 @@ export default function Home() {
         </tbody>
       </table>
     </div>
-    <h1>EPUB Reader</h1>
-      <DynamicEpubReader/>
     </PrivateRoute>
   );
 }
