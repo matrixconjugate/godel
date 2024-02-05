@@ -7,7 +7,6 @@ import PrivateRoute from '@/components/PrivateRoute';
 const Module = () => {
   const [showAddModulePopup, setShowAddModulePopup] = useState(false);
   const [newModuleName, setNewModuleName] = useState('');
-  const [Moduledesc, setModuledesc] = useState('');
   const [modules, setModules] = useState([]);
   const [showAddSlideInput, setShowAddSlideInput] = useState(false);
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(null);
@@ -66,17 +65,14 @@ const Module = () => {
         },
         body: JSON.stringify({
           module_name: newModuleName,
-          module_description: Moduledesc,
           slides: [], // Initialize slides as an empty array
         }),
       });
        console.log(newModuleName);
-       console.log(Moduledesc);
       if (response.ok) {
         const newModule = await response.json();
         setModules([...modules, newModule]);
         console.log('Saving Module:', newModuleName);
-        console.log('Module desc:', Moduledesc);
         handleClosePopup();
       } else {
         console.error('Error adding module:', response.statusText);
@@ -167,15 +163,6 @@ const Module = () => {
                 id="newCourseName"
                 value={newModuleName}
                 onChange={(e) => setNewModuleName(e.target.value)}
-              />
-              <label htmlFor="newModuleDesc">
-                <h3>Description:</h3>
-              </label>
-              <input
-                type="text"
-                id="newCoursedesc"
-                value={Moduledesc}
-                onChange={(e) => setModuledesc(e.target.value)}
               />
 
               <div className={styles.popupButtons}>

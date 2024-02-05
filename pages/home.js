@@ -8,6 +8,7 @@ export default function Home() {
   const [courses, setCourses] = useState([]);
   const [showAddCoursePopup, setShowAddCoursePopup] = useState(false);
   const [newCourseName, setNewCourseName] = useState('');
+  const [contentSnippet, setContentSnippet] = useState('');
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -73,8 +74,35 @@ export default function Home() {
     }
   };
   
+  const handleFileUpload = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result);
+        const outputFiles = result.outputFiles || [];
+        console.log(outputFiles);
+        handleSaveCourse(); 
+      } else {
+        console.error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const file = event.target.file.files[0];
+    handleFileUpload(file);
+  };
   return (
     <PrivateRoute>
     <div className={styles.container}>
@@ -93,12 +121,22 @@ export default function Home() {
               value={newCourseName}
               onChange={(e) => setNewCourseName(e.target.value)}
             />
-
-            <div className={styles.popupButtons}>
-              <button onClick={handleSaveCourse}>Save</button>
+    
+      <form onSubmit={handleSubmit}>
+        <input type="file" name="file" required />
+        <button type="submit">Upload File</button>
+      </form>
+      {contentSnippet && (
+        <div>
+          <h2>File Content Snippet</h2>
+          <p>{contentSnippet}</p>
+        </div>
+      )}
+       <div className={styles.popupButtons}>
+              {/* <button onClick={handleSaveCourse}>Save</button> */}
               <button onClick={handleClosePopup}>Close</button>
             </div>
-          </div>
+        </div>
         </div>
       )}
 

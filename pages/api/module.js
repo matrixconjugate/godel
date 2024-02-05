@@ -14,8 +14,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       try {
-        const { module_name, module_description} = req.body;
-        if (!module_name || !module_description) {
+        const { module_name} = req.body;
+        if (!module_name) {
           return res.status(400).json({ error: 'Module name and description are required' });
         }
         const course = await Course.findById(courseId);
@@ -25,7 +25,6 @@ export default async function handler(req, res) {
         const moduleSlug = slugify(module_name, { lower: true });
         const newModule = {
           module_name,
-          module_description,
           slug: moduleSlug,
           slides: [],  // initialize slides as an empty array
         };
